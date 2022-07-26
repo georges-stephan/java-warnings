@@ -30,20 +30,11 @@ package warnings.jw;
  * @author Georges Stephan
  *
  */
-public class SlowExecutionWarning extends AbstractWarning {
-	private String message;
-	
-	public SlowExecutionWarning(String message) {
-		this.message=message;
-	}
-	
-	@Override
-	public String getMessage() {
-		return message;
-	}
-	
-	public void setMessage(String message) {
-		this.message=message;
+public class SlowExecutionWarning extends DefaultWarning {
+
+	public SlowExecutionWarning(int warningID, String message, StackTraceElement[] stes, String methodName,
+			long threadID) {
+		super(warningID, message, stes, methodName, threadID);
 	}
 
 }

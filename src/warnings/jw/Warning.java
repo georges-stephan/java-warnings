@@ -1,7 +1,7 @@
 /*
  * MIT License
  * 
- * Copyright (c) 2014 georges-stephan
+ * Copyright (c) 2022 georges-stephan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,25 +25,28 @@
 
 package warnings.jw;
 
+import java.util.Map;
+import java.util.Optional;
+
 /**
  * 
  * @author Georges Stephan
  *
  */
 public interface Warning {
-	
-	public int getWarningID();
-	
-	public void setWarningID(int warningID);
-	
+
+	public Optional<Integer> getWarningID();
+
 	public String getMessage();
-	
-	public StackTraceElement getSource();
-	
-	public void setSource(StackTraceElement ste);
-	
+
+	public String getMethodName();
+
+	public StackTraceElement[] getSource();
+
 	public long getThreadID();
 
-	public void setThreadID(long threadID);
+	public Optional<Map<String, Object>> getNamedParameters();
+
+	public Optional<Object[]> getUnnamedParameters();
 
 }

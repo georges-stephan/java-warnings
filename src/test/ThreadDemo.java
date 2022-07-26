@@ -25,21 +25,20 @@
 
 package test;
 
-import warnings.jw.SimpleWarning;
 import warnings.jw.WarningsRegister;
 
 public class ThreadDemo extends Thread {
-	
+
 	public void run() {
 		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-		
+
 		try {
-			Thread.sleep((long)Math.random()*1000);
+			Thread.sleep((long) Math.random() * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		WarningsRegister.registerWarning(new SimpleWarning("Achtung!"));
+
+		WarningsRegister.registerWarning("Achtung!");
 	}
 
 }

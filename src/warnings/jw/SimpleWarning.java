@@ -1,7 +1,7 @@
 /*
  * MIT License
  * 
- * Copyright (c) 2014 georges-stephan
+ * Copyright (c) 2022 georges-stephan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,25 +25,17 @@
 
 package warnings.jw;
 
+import java.util.Map;
+
 /**
  * 
  * @author Georges Stephan
  *
  */
-public class SimpleWarning extends AbstractWarning {
-	private String message;
-	
-	public SimpleWarning(String message) {
-		this.message=message;
-	}
-	
-	@Override
-	public String getMessage() {
-		return message;
-	}
-	
-	public void setMessage(String message) {
-		this.message=message;
+public class SimpleWarning extends DefaultWarning {
+
+	public SimpleWarning(int warningID, String message, StackTraceElement[] stes, String methodName, long threadID) {
+		super(warningID, message, stes, methodName, threadID);
 	}
 
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  * 
- * Copyright (c) 2014 georges-stephan
+ * Copyright (c) 2022 georges-stephan
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,50 +25,58 @@
 
 package test;
 
-import warnings.jw.SimpleWarning;
-import warnings.jw.SlowExecutionWarning;
+import java.util.HashMap;
+import java.util.Map;
+
 import warnings.jw.Warning;
 import warnings.jw.WarningsRegister;
 
 public class SimpleWarningsDemo {
-	
+
 	public SimpleWarningsDemo() {
 		doSomeWork1();
 		doSomeWork2();
 		doSomeWork3();
 		doSomeWork4();
-		
+
 		Warning[] w = WarningsRegister.getWarnings();
-		
-		if(w==null || w.length<1) {
+
+		if (w == null || w.length < 1) {
 			System.out.println("No Warnings Found");
 		} else {
-			for(int i=0;i<w.length;i++) {
+			for (int i = 0; i < w.length; i++) {
 				System.out.println(w[i]);
-			}			
+			}
 		}
-		
+
 		System.out.println("Done.");
 	}
-	
+
 	private void doSomeWork1() {
 		// Do some work
 	}
-	
+
 	private void doSomeWork2() {
 		// Do some other work, and suddenly...
 		// Ouch...
-		WarningsRegister.registerWarning(new SimpleWarning("Achtung!"));
+		WarningsRegister.registerWarning("Ouch!");
 	}
-	
+
 	private void doSomeWork3() {
 		// Do some work
+		WarningsRegister.registerWarning("Oh la la...", "Oh", "la", 22);
 	}
-	
+
 	private void doSomeWork4() {
 		// Do some work
-		WarningsRegister.registerWarning(new SlowExecutionWarning("es demasiado lento"));
-		
+		Map<String, Object> namedParams = new HashMap<>();
+		namedParams.put("toul", 100);
+		namedParams.put("3ard", 2);
+
+		Object[] unNamedParams = { "Un", "Deux", "Trois" };
+
+		WarningsRegister.registerWarning("es demasiado lento", unNamedParams, namedParams);
+
 	}
 
 	public static void main(String[] args) {

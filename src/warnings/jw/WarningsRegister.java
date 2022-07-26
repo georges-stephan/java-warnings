@@ -25,8 +25,11 @@
 
 package warnings.jw;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -34,66 +37,54 @@ import java.util.Vector;
  *
  */
 public class WarningsRegister {
-	private static int warningID=0;
-	private static HashMap<Long,Vector<Warning>> warningsMap = new HashMap<Long,Vector<Warning>>();
-	
-	public static void registerWarning(Warning warning) {
+	private static int warningID = 0;
+	private static HashMap<Long, ArrayList<Warning>> warningsMap = new HashMap<Long, ArrayList<Warning>>();
+
+	public static void registerWarning(String message) {
+		registerWarning(message, null, null);
+	}
+
+	public static void registerWarning(String message, Object... args) {
+		registerWarning(message, args, null);
+	}
+
+	public static void registerWarning(String message, Object[] unnamedParameters,
+			Map<String, Object> namedParameters) {
+
 		long threadID = Thread.currentThread().getId();
-		
+
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
-		
-		StackTraceElement ste = getInvokingElement(elements,"registerWarning");
-		
-		warning.setSource(ste);
-		warning.setThreadID(threadID);
-		
+
 		warningID++;
-		warning.setWarningID(warningID);
-		
-		Vector<Warning> vw = warningsMap.get(threadID);
-		if(vw==null) {
-			vw = new Vector<Warning>();
-			vw.add(warning);
+
+		DefaultWarning aw = new DefaultWarning(warningID, message, elements, "registerWarning", threadID,
+				unnamedParameters,
+				namedParameters);
+
+		ArrayList<Warning> vw = warningsMap.get(threadID);
+		if (vw == null) {
+			vw = new ArrayList<Warning>();
+			vw.add(aw);
 			warningsMap.put(threadID, vw);
 		} else {
-			vw.add(warning);
+			vw.add(aw);
 		}
 	}
-	
-	private static StackTraceElement getInvokingElement(StackTraceElement[] elements,String methodName) {
-		int invokingMethodIndex =-1;
-		StackTraceElement ste = null;
-		
-		for(int i=0;i<elements.length;i++) {
-			if(invokingMethodIndex==i) {
-				ste=elements[i];
-			} else if(elements[i].getMethodName().equals(methodName) 
-					&& elements[i].getClassName().equals("com.machin.warnings.WarningsRegister")) {
-				invokingMethodIndex=i;
-				invokingMethodIndex++;
-			}
-		}
-		
-		return ste;
-	}
-	
+
 	public static Warning[] getWarnings() {
 		long threadID = Thread.currentThread().getId();
-		
-		StackTraceElement[] elements = Thread.currentThread().getStackTrace();		
-		StackTraceElement ste = getInvokingElement(elements,"getWarnings");
-		
-		Vector<Warning> vw = warningsMap.get(threadID);
-		Vector<Warning> vws = new Vector<Warning>();
-		
-		for(int i=0;i<vw.size();i++) {
-			if(vw.elementAt(i).getSource().getMethodName().equals(ste.getMethodName())) { // TODO maybe add the package name
-				vws.add(vw.elementAt(i));
-				// TODO maybe remove warnings on retrieval ?
-			}
-		}
-		
-		return vw.toArray(new Warning[vws.size()]);
+
+		ArrayList<Warning> vw = warningsMap.get(threadID);
+
+		Warning[] warnArray = vw.stream()
+				.filter(warn -> {
+					return Arrays.stream(warn.getSource())
+							.collect(Collectors.toList()).toArray().length > 0;
+				})
+				.map(w -> (Warning) w)
+				.collect(Collectors.toList()).toArray(Warning[]::new);
+
+		return warnArray;
 
 	}
 
