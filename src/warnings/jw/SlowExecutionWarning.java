@@ -25,9 +25,11 @@
 
 package warnings.jw;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This is an example of how a custom warning class could be modelled
  * 
  * @author Georges Stephan
  *
@@ -39,15 +41,15 @@ public class SlowExecutionWarning extends DefaultWarning {
 	}
 
 	public SlowExecutionWarning(String message, Map<String, Object> namedParameters) {
-		super(message, namedParameters);
+		super(message, namedParameters, new Object[0]);
 	}
 
 	public SlowExecutionWarning(String message, Object[] unnamedParameters) {
-		super(message, unnamedParameters);
+		super(message, new HashMap<String, Object>(), unnamedParameters);
 	}
 
-	public SlowExecutionWarning(String message, Object[] unnamedParameters, Map<String, Object> namedParameters) {
-		super(message, unnamedParameters, namedParameters);
+	public SlowExecutionWarning(String message, Map<String, Object> namedParameters, Object... unnamedParameters) {
+		super(message, namedParameters, unnamedParameters);
 	}
 
 }

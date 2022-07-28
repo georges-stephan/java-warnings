@@ -81,8 +81,7 @@ public class DefaultWarning implements Warning, Serializable {
 	}
 
 	public DefaultWarning(long warningID, String message, StackTraceElement[] stes, String methodName, long threadID,
-			Object[] unnamedParameters,
-			Map<String, Object> namedParameters) {
+			Map<String, Object> namedParameters, Object... unnamedParameters) {
 		this.timestamp = System.currentTimeMillis();
 		this.warningID = warningID;
 		this.message = message;
