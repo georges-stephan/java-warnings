@@ -25,6 +25,7 @@
 
 package warnings.jw;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -141,7 +142,7 @@ public class WarningsRegister {
 				if (removeReturnedWarnings) {
 					writeLock.lock();
 					try {
-						threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID)
+						threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID);
 					} finally {
 						writeLock.unlock();
 					}
@@ -155,17 +156,16 @@ public class WarningsRegister {
 				.stream().map(m -> m.getValue())
 				.collect(Collectors.toList()).toArray(Warning[]::new);
 
-				if (removeReturnedWarnings) {
-					writeLock.lock();
-					try {
-						Arrays
+		if (removeReturnedWarnings) {
+			writeLock.lock();
+			try {
+				Arrays
 						.stream(warnArray)
-						.forEach(a -> threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID))
-						.collect(Collectors.toSet()); // The set won't be needed
-					} finally {
-						writeLock.unlock();
-					}
-				}
+						.forEach(a -> threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID));
+			} finally {
+				writeLock.unlock();
+			}
+		}
 
 		return Optional.of(warnArray);
 

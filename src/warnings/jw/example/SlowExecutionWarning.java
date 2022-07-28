@@ -23,10 +23,12 @@
  * 
  */
 
-package warnings.jw;
+package warnings.jw.example;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import warnings.jw.DefaultWarning;
 
 /**
  * This is an example of how a custom warning class could be modelled
