@@ -81,7 +81,7 @@ public class SimpleWarningsDemo {
 
 		Object[] unNamedParams = { "Un", "Deux", "Trois" };
 
-		collectedWarningIDs.add(WarningsRegister.registerWarning("es demasiado lento", unNamedParams, namedParams));
+		collectedWarningIDs.add(WarningsRegister.registerWarning("es demasiado lento", namedParams, unNamedParams));
 
 	}
 

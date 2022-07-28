@@ -55,8 +55,7 @@ public class WarningsRegister {
 
 		warningID++;
 		DefaultWarning aw = new DefaultWarning(warningID, message, elements, "registerWarning", threadID,
-				unnamedParameters,
-				namedParameters);
+				namedParameters, unnamedParameters);
 
 		HashMap<Long, Warning> warningIDWarningMap = threadIDMapOfWarningIDWarningMap.get(threadID);
 		if (warningIDWarningMap == null) {
