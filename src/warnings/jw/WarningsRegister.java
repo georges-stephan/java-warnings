@@ -55,7 +55,7 @@ public class WarningsRegister {
 		return registerWarning(message, new HashMap<String, Object>(), unnamedParameters);
 	}
 
-	public static synchronized long registerWarning(String message, Map<String, Object> namedParameters,
+	public static long registerWarning(String message, Map<String, Object> namedParameters,
 			Object... unnamedParameters) {
 
 		writeLock.lock();
@@ -82,21 +82,19 @@ public class WarningsRegister {
 		}
 	}
 
-	public static synchronized Optional<Warning[]> getWarnings(long threadID) {
+	public static Optional<Warning[]> getWarnings(long threadID) {
 		return getWarnings(threadID, -1L, false);
 	}
 
-	public static synchronized Optional<Warning[]> popWarnings(long threadID) {
+	public static Optional<Warning[]> popWarnings(long threadID) {
 		return getWarnings(threadID, -1L, true);
 	}
 
-	public static synchronized Optional<Warning[]> popWarnings(long threadID, long warningID) {
-		// TODO invoke the code in the body of --> public static synchronized
-		// Optional<Warning[]> getWarnings(long threadID, long warningID) {
+	public static Optional<Warning[]> popWarnings(long threadID, long warningID) {
 		return getWarnings(threadID, warningID, true);
 	}
 
-	public static synchronized Optional<Warning[]> getWarnings(long threadID, long warningID) {
+	public static Optional<Warning[]> getWarnings(long threadID, long warningID) {
 
 		readLock.lock();
 		try {
@@ -121,7 +119,7 @@ public class WarningsRegister {
 		}
 	}
 
-	private static synchronized Optional<Warning[]> getWarnings(long threadID, long warningID,
+	private static Optional<Warning[]> getWarnings(long threadID, long warningID,
 			boolean removeReturnedWarnings) {
 
 		if (threadID < 0)
