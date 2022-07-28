@@ -28,6 +28,8 @@ package warnings.jw;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +38,11 @@ import java.util.stream.Collectors;
  *
  */
 public class WarningsRegister {
+	// Locking
+	private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+	private static Lock readLock = rwLock.readLock();
+	private static Lock writeLock = rwLock.writeLock();
+	// Others
 	private static long warningID = 0L;
 	private static Map<Long, HashMap<Long, Warning>> threadIDMapOfWarningIDWarningMap = new HashMap<Long, HashMap<Long, Warning>>();
 
@@ -50,23 +57,28 @@ public class WarningsRegister {
 	public static synchronized long registerWarning(String message, Map<String, Object> namedParameters,
 			Object... unnamedParameters) {
 
-		long threadID = Thread.currentThread().getId();
-		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		writeLock.lock();
+		try {
+			long threadID = Thread.currentThread().getId();
+			StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 
-		warningID++;
-		DefaultWarning aw = new DefaultWarning(warningID, message, elements, "registerWarning", threadID,
-				namedParameters, unnamedParameters);
+			warningID++;
+			DefaultWarning aw = new DefaultWarning(warningID, message, elements, "registerWarning", threadID,
+					namedParameters, unnamedParameters);
 
-		HashMap<Long, Warning> warningIDWarningMap = threadIDMapOfWarningIDWarningMap.get(threadID);
-		if (warningIDWarningMap == null) {
-			warningIDWarningMap = new HashMap<Long, Warning>();
-			warningIDWarningMap.put(warningID, aw);
-		} else {
-			warningIDWarningMap.put(warningID, aw);
+			HashMap<Long, Warning> warningIDWarningMap = threadIDMapOfWarningIDWarningMap.get(threadID);
+			if (warningIDWarningMap == null) {
+				warningIDWarningMap = new HashMap<Long, Warning>();
+				warningIDWarningMap.put(warningID, aw);
+			} else {
+				warningIDWarningMap.put(warningID, aw);
+			}
+			threadIDMapOfWarningIDWarningMap.put(threadID, warningIDWarningMap);
+
+			return warningID;
+		} finally {
+			writeLock.unlock();
 		}
-		threadIDMapOfWarningIDWarningMap.put(threadID, warningIDWarningMap);
-
-		return warningID;
 	}
 
 	public static synchronized Optional<Warning[]> getWarnings(long threadID) {
@@ -84,25 +96,31 @@ public class WarningsRegister {
 	}
 
 	public static synchronized Optional<Warning[]> getWarnings(long threadID, long warningID) {
-		Optional<Warning[]> aWarning = getWarnings(threadID, warningID, false);
-		if (!aWarning.isPresent()) {
-			return Optional.empty();
-		}
 
-		Warning[] warnings = aWarning.get();
-		switch (warnings.length) {
-			case 0:
+		readLock.lock();
+		try {
+			Optional<Warning[]> aWarning = getWarnings(threadID, warningID, false);
+			if (!aWarning.isPresent()) {
 				return Optional.empty();
-			case 1:
-				return Optional.of(warnings);
-			default:
-				throw new IllegalArgumentException(
-						String.format("Too many (%i) warnings found for thread id: %l and warning id: %l",
-								warnings.length, threadID, warningID));
+			}
+
+			Warning[] warnings = aWarning.get();
+			switch (warnings.length) {
+				case 0:
+					return Optional.empty();
+				case 1:
+					return Optional.of(warnings);
+				default:
+					throw new IllegalArgumentException(
+							String.format("Too many (%i) warnings found for thread id: %l and warning id: %l",
+									warnings.length, threadID, warningID));
+			}
+		} finally {
+			readLock.unlock();
 		}
 	}
 
-	public static synchronized Optional<Warning[]> getWarnings(long threadID, long warningID,
+	private static synchronized Optional<Warning[]> getWarnings(long threadID, long warningID,
 			boolean removeReturnedWarnings) {
 
 		if (threadID < 0)
@@ -120,6 +138,14 @@ public class WarningsRegister {
 			if (threadIDMapOfWarningIDWarningMap.get(threadID) != null
 					&& threadIDMapOfWarningIDWarningMap.get(threadID).get(warningID) != null) {
 				Warning[] warnings = { threadIDMapOfWarningIDWarningMap.get(threadID).get(warningID) };
+				if (removeReturnedWarnings) {
+					writeLock.lock();
+					try {
+						threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID)
+					} finally {
+						writeLock.unlock();
+					}
+				}
 				return Optional.ofNullable(warnings);
 			}
 		}
@@ -128,6 +154,18 @@ public class WarningsRegister {
 		Warning[] warnArray = mapOfWarningsPerThreadID.entrySet()
 				.stream().map(m -> m.getValue())
 				.collect(Collectors.toList()).toArray(Warning[]::new);
+
+				if (removeReturnedWarnings) {
+					writeLock.lock();
+					try {
+						Arrays
+						.stream(warnArray)
+						.forEach(a -> threadIDMapOfWarningIDWarningMap.get(threadID).remove(warningID))
+						.collect(Collectors.toSet()); // The set won't be needed
+					} finally {
+						writeLock.unlock();
+					}
+				}
 
 		return Optional.of(warnArray);
 
