@@ -69,4 +69,4 @@ Optional<Warning[]> warnings = WarningsRegister.getWarnings(Thread.currentThread
 
 ```
 
-What would a wrning look like
+Again this is more of a thought experiment, showing what we can do with the Java language.
