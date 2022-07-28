@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -37,15 +38,41 @@ import java.util.Optional;
  *
  */
 public class DefaultWarning implements Warning, Serializable {
-	private int warningID = -1; // undefined
-	private long threadID = -1; // undefined
+	private long warningID = -1L; // undefined
+	private long threadID = -1L; // undefined
 	private String message;
 	private StackTraceElement[] stes;
 	private String methodName;
 	private Object[] unnamedParameters;
 	private Map<String, Object> namedParameters = new HashMap<>();
+	private long timestamp;
 
-	public DefaultWarning(int warningID, String message, StackTraceElement[] stes, String methodName, long threadID) {
+	public DefaultWarning(String message) {
+		this.timestamp = System.currentTimeMillis();
+		this.message = message;
+	}
+
+	public DefaultWarning(String message, Map<String, Object> namedParameters) {
+		this.timestamp = System.currentTimeMillis();
+		this.message = message;
+		this.namedParameters = namedParameters;
+	}
+
+	public DefaultWarning(String message, Object... unnamedParameters) {
+		this.timestamp = System.currentTimeMillis();
+		this.message = message;
+		this.unnamedParameters = unnamedParameters;
+	}
+
+	public DefaultWarning(String message, Map<String, Object> namedParameters, Object... unnamedParameters) {
+		this.timestamp = System.currentTimeMillis();
+		this.message = message;
+		this.unnamedParameters = unnamedParameters;
+		this.namedParameters = namedParameters;
+	}
+
+	public DefaultWarning(long warningID, String message, StackTraceElement[] stes, String methodName, long threadID) {
+		this.timestamp = System.currentTimeMillis();
 		this.warningID = warningID;
 		this.message = message;
 		this.stes = stes;
@@ -53,9 +80,10 @@ public class DefaultWarning implements Warning, Serializable {
 		this.threadID = threadID;
 	}
 
-	public DefaultWarning(int warningID, String message, StackTraceElement[] stes, String methodName, long threadID,
+	public DefaultWarning(long warningID, String message, StackTraceElement[] stes, String methodName, long threadID,
 			Object[] unnamedParameters,
 			Map<String, Object> namedParameters) {
+		this.timestamp = System.currentTimeMillis();
 		this.warningID = warningID;
 		this.message = message;
 		this.stes = stes;
@@ -65,6 +93,10 @@ public class DefaultWarning implements Warning, Serializable {
 		if (namedParameters != null) {
 			this.namedParameters = namedParameters;
 		}
+	}
+
+	public long getTimestamp() {
+		return this.timestamp;
 	}
 
 	public String getMethodName() {
@@ -87,8 +119,8 @@ public class DefaultWarning implements Warning, Serializable {
 	}
 
 	@Override
-	public Optional<Integer> getWarningID() {
-		if (this.warningID < 0) {
+	public Optional<Long> getWarningID() {
+		if (this.warningID < 0L) {
 			return Optional.empty();
 		}
 		return Optional.of(warningID);
@@ -110,6 +142,7 @@ public class DefaultWarning implements Warning, Serializable {
 	@Override
 	public String toString() {
 		StringBuilder warningAsString = new StringBuilder();
+		warningAsString.append(String.format("Warning timetamp: %d.\r\n", timestamp));
 		warningAsString.append(String.format("Warning message: %s.\r\n", message));
 		warningAsString.append(String.format("ThreadID: %s, Warning ID: %s.", threadID, warningID));
 		warningAsString.append("\r\n");
@@ -128,7 +161,7 @@ public class DefaultWarning implements Warning, Serializable {
 		if (unnamedParameters != null && unnamedParameters.length > 0) {
 			warningAsString.append("Unnamed parameters:\r\n");
 			Arrays.stream(unnamedParameters)
-					.filter(x -> x != null)
+					.filter(Objects::nonNull)
 					.forEach(x -> {
 						warningAsString.append("\t");
 						warningAsString.append(x.toString());
@@ -140,6 +173,7 @@ public class DefaultWarning implements Warning, Serializable {
 			warningAsString.append("Stack trace:\r\n");
 			Arrays.stream(stes)
 					.filter(x -> !x.toString().startsWith("java.base/java.lang.Thread.getStackTrace"))
+					.filter(x -> !x.toString().startsWith("warnings.jw.WarningsRegister.registerWarning"))
 					.forEach(x -> {
 						warningAsString.append("\t");
 						warningAsString.append(x.toString());

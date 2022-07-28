@@ -35,7 +35,7 @@ import java.util.Optional;
  */
 public interface Warning {
 
-	public Optional<Integer> getWarningID();
+	public Optional<Long> getWarningID();
 
 	public String getMessage();
 
@@ -48,5 +48,7 @@ public interface Warning {
 	public Optional<Map<String, Object>> getNamedParameters();
 
 	public Optional<Object[]> getUnnamedParameters();
+
+	public long getTimestamp();
 
 }

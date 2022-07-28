@@ -25,6 +25,8 @@
 
 package warnings.jw;
 
+import java.util.Map;
+
 /**
  * 
  * @author Georges Stephan
@@ -32,9 +34,20 @@ package warnings.jw;
  */
 public class SlowExecutionWarning extends DefaultWarning {
 
-	public SlowExecutionWarning(int warningID, String message, StackTraceElement[] stes, String methodName,
-			long threadID) {
-		super(warningID, message, stes, methodName, threadID);
+	public SlowExecutionWarning(String message) {
+		super(message);
+	}
+
+	public SlowExecutionWarning(String message, Map<String, Object> namedParameters) {
+		super(message, namedParameters);
+	}
+
+	public SlowExecutionWarning(String message, Object[] unnamedParameters) {
+		super(message, unnamedParameters);
+	}
+
+	public SlowExecutionWarning(String message, Object[] unnamedParameters, Map<String, Object> namedParameters) {
+		super(message, unnamedParameters, namedParameters);
 	}
 
 }

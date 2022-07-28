@@ -25,13 +25,17 @@
 
 package test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import warnings.jw.Warning;
 import warnings.jw.WarningsRegister;
 
 public class SimpleWarningsDemo {
+	private ArrayList<Long> collectedWarningIDs = new ArrayList<>();
 
 	public SimpleWarningsDemo() {
 		doSomeWork1();
@@ -39,14 +43,16 @@ public class SimpleWarningsDemo {
 		doSomeWork3();
 		doSomeWork4();
 
-		Warning[] w = WarningsRegister.getWarnings();
+		long thisThreadID = Thread.currentThread().getId();
 
-		if (w == null || w.length < 1) {
-			System.out.println("No Warnings Found");
+		System.out.println("This thread ID:" + thisThreadID);
+
+		Optional<Warning[]> warnings = WarningsRegister.getWarnings(thisThreadID);
+
+		if (warnings.isPresent()) {
+			Arrays.stream(warnings.get()).forEach(System.out::println);
 		} else {
-			for (int i = 0; i < w.length; i++) {
-				System.out.println(w[i]);
-			}
+			System.out.println(String.format("No warnings found for thread %d.", thisThreadID));
 		}
 
 		System.out.println("Done.");
@@ -59,12 +65,12 @@ public class SimpleWarningsDemo {
 	private void doSomeWork2() {
 		// Do some other work, and suddenly...
 		// Ouch...
-		WarningsRegister.registerWarning("Ouch!");
+		collectedWarningIDs.add(WarningsRegister.registerWarning("Ouch!"));
 	}
 
 	private void doSomeWork3() {
 		// Do some work
-		WarningsRegister.registerWarning("Oh la la...", "Oh", "la", 22);
+		collectedWarningIDs.add(WarningsRegister.registerWarning("Oh la la...", "Oh", "la", 22));
 	}
 
 	private void doSomeWork4() {
@@ -75,7 +81,7 @@ public class SimpleWarningsDemo {
 
 		Object[] unNamedParams = { "Un", "Deux", "Trois" };
 
-		WarningsRegister.registerWarning("es demasiado lento", unNamedParams, namedParams);
+		collectedWarningIDs.add(WarningsRegister.registerWarning("es demasiado lento", unNamedParams, namedParams));
 
 	}
 
