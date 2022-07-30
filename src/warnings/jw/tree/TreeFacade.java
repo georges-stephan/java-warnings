@@ -1,5 +1,7 @@
 package warnings.jw.tree;
 
+import java.util.List;
+
 import warnings.jw.DefaultWarning;
 import warnings.jw.Warning;
 
@@ -52,8 +54,8 @@ public class TreeFacade {
                 hasNext = false;
             }
 
-            TreeNode<String, Warning> child = movingNode.getChild(packagePathNames[i]);
-            if (child == null) {
+            List<TreeNode<String, Warning>> children = movingNode.getChildren(packagePathNames[i]);
+            if (children == null) {
                 // First occurence of this package name in the tree
                 if (hasNext) {
                     movingNode = movingNode
@@ -64,7 +66,8 @@ public class TreeFacade {
                 }
 
             } else {
-                movingNode = child;
+                movingNode = movingNode.getChild(packagePathNames[i]).get();
+                // movingNode = children.getChild(packagePathNames[i]);
             }
 
         }

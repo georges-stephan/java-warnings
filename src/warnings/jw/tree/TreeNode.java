@@ -1,7 +1,11 @@
 package warnings.jw.tree;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * <pre>
@@ -26,7 +30,7 @@ import java.util.Map;
 public class TreeNode<K, V> {
     private K key = null;
     private V data = null;
-    private Map<K, TreeNode<K, V>> children = new HashMap<>();
+    private Map<K, List<TreeNode<K, V>>> children = new HashMap<>();
     private TreeNode<K, V> parent = null;
 
     public TreeNode(K key, V data) {
@@ -34,22 +38,41 @@ public class TreeNode<K, V> {
         this.key = key;
     }
 
-    public int getChildrenCount() {
-        return children.size();
+    public long getChildrenCount() {
+        final long count = children.entrySet().stream().map(e -> {
+            e.getValue().stream().map(f -> {
+                return f;
+            });
+            return e;
+        }).collect(Collectors.counting());
+        return count;
     }
 
     public TreeNode<K, V> addChild(TreeNode<K, V> child) {
         child.setParent(this);
-        children.put(child.getKey(), child);
-        return children.get(child.getKey());
+        List<TreeNode<K, V>> nodesChildrenList = children.get(child.getKey());
+
+        if (nodesChildrenList == null) {
+            List<TreeNode<K, V>> aList = new ArrayList<>();
+            aList.add(child);
+            children.put(key, aList);
+        } else {
+            nodesChildrenList.add(child);
+        }
+
+        return child;
     }
 
-    public TreeNode<K, V> getChild(K key) {
+    public TreeNode<K, V> getChild(K key, int index) {
+        return children.get(key).get(index);
+    }
+
+    public Optional<TreeNode<K, V>> getChild(K key) {
+        return children.get(key).stream().filter(e -> e.getKey().equals(key)).findFirst();
+    }
+
+    public List<TreeNode<K, V>> getChildren(K key) {
         return children.get(key);
-    }
-
-    public Map<K, TreeNode<K, V>> getChildren() {
-        return children;
     }
 
     public V getData() {
@@ -72,13 +95,14 @@ public class TreeNode<K, V> {
         return parent;
     }
 
-    public void traverse(TreeNode<K, V> node) {
-        if (node.getChildrenCount() < 1) {
-            System.out.println(String.format("Path:%s, value is:%s", node.getKey(), node.getData()));
-            return;
-        }
-        node.getChildren().entrySet().stream().forEach(e -> traverse(node));
-    }
+    // public void traverse(TreeNode<K, V> node) {
+    // if (node.getChildrenCount() < 1) {
+    // System.out.println(String.format("Path:%s, value is:%s", node.getKey(),
+    // node.getData()));
+    // return;
+    // }
+    // node.getChildren().entrySet().stream().forEach(e -> traverse(node));
+    // }
 
     @Override
     public String toString() {
