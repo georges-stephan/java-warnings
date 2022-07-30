@@ -141,6 +141,8 @@ public class DefaultWarning implements Warning, Serializable {
 	@Override
 	public String toString() {
 		StringBuilder warningAsString = new StringBuilder();
+		warningAsString.append(this.getMessage());
+		warningAsString.append("\r\n");
 		warningAsString.append(String.format("Warning timetamp: %d.\r\n", timestamp));
 		warningAsString.append(String.format("Warning message: %s.\r\n", message));
 		warningAsString.append(String.format("ThreadID: %s, Warning ID: %s.", threadID, warningID));

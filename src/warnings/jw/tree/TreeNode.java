@@ -58,6 +58,7 @@ public class TreeNode<K, V> {
             children.put(key, aList);
         } else {
             nodesChildrenList.add(child);
+            children.put(key, nodesChildrenList);
         }
 
         return child;
@@ -95,17 +96,28 @@ public class TreeNode<K, V> {
         return parent;
     }
 
-    // public void traverse(TreeNode<K, V> node) {
-    // if (node.getChildrenCount() < 1) {
-    // System.out.println(String.format("Path:%s, value is:%s", node.getKey(),
-    // node.getData()));
-    // return;
-    // }
-    // node.getChildren().entrySet().stream().forEach(e -> traverse(node));
-    // }
-
     @Override
     public String toString() {
+        StringBuilder buffer = new StringBuilder();
+        buffer.append('(');
+        buffer.append(parent == null ? "null" : this.parent.getKey());
+        buffer.append(",");
+
+        buffer.append(this.data == null ? ""
+                : this.data.toString().length() > 10 ? (this.data.toString().substring(0, 7) + "...")
+                        : this.data.toString());
+        buffer.append(", map(");
+        children.entrySet().stream().forEach(e -> {
+            buffer.append(e.getKey());
+            buffer.append(",");
+        });
+        buffer.append(')');
+        buffer.append(')');
+
+        return buffer.toString();
+    }
+
+    public String toStringe() {
         StringBuilder buffer = new StringBuilder();
         buffer.append("Parent key:");
         buffer.append(parent == null ? "null" : this.parent.getKey());
