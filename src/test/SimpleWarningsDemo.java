@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import warnings.jw.Warning;
-import warnings.jw.WarningsRegister;
+import warnings.jw.InMemoryWarningsRegister;
 
 public class SimpleWarningsDemo {
 	private ArrayList<Long> collectedWarningIDs = new ArrayList<>();
@@ -47,7 +47,7 @@ public class SimpleWarningsDemo {
 
 		System.out.println("This thread ID:" + thisThreadID);
 
-		Optional<Warning[]> warnings = WarningsRegister.getWarnings(thisThreadID);
+		Optional<Warning[]> warnings = InMemoryWarningsRegister.getWarnings(thisThreadID);
 
 		if (warnings.isPresent()) {
 			Arrays.stream(warnings.get()).forEach(System.out::println);
@@ -65,12 +65,12 @@ public class SimpleWarningsDemo {
 	private void doSomeWork2() {
 		// Do some other work, and suddenly...
 		// Ouch...
-		collectedWarningIDs.add(WarningsRegister.registerWarning("Ouch!"));
+		collectedWarningIDs.add(InMemoryWarningsRegister.registerWarning("Ouch!"));
 	}
 
 	private void doSomeWork3() {
 		// Do some work
-		collectedWarningIDs.add(WarningsRegister.registerWarning("Oh la la...", "Oh", "la", 22));
+		collectedWarningIDs.add(InMemoryWarningsRegister.registerWarning("Oh la la...", "Oh", "la", 22));
 	}
 
 	private void doSomeWork4() {
@@ -81,7 +81,8 @@ public class SimpleWarningsDemo {
 
 		Object[] unNamedParams = { "Un", "Deux", "Trois" };
 
-		collectedWarningIDs.add(WarningsRegister.registerWarning("es demasiado lento", namedParams, unNamedParams));
+		collectedWarningIDs
+				.add(InMemoryWarningsRegister.registerWarning("es demasiado lento", namedParams, unNamedParams));
 
 	}
 

@@ -34,11 +34,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
 
 /**
+ * A collector of warnings which stores the warning in a HashMap in memory
  * 
  * @author Georges Stephan
  *
  */
-public class WarningsRegister {
+public class InMemoryWarningsRegister {
 	// Locking
 	private static ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
 	private static Lock readLock = rwLock.readLock();
